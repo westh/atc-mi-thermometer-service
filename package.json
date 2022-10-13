@@ -1,0 +1,43 @@
+{
+  "name": "atc-mi-thermometer-service",
+  "author": "westh",
+  "license": "MIT",
+  "version": "0.0.3",
+  "description": "A service that picks up BLE broadcasts from a Mi Thermometer flashed with the ATC firmware and POSTs it to Graphite",
+  "bugs": {
+    "url": "https://github.com/westh/atc-mi-thermometer-service/issues"
+  },
+  "homepage": "https://github.com/westh/atc-mi-thermometer-service#readme",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "lint": "eslint --fix .",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "yarn lint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {
+    "@abandonware/noble": "^1.9.2-15",
+    "@westh/atc-mi-thermometer-parser": "^1.0.0",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "nodemon": "^2.0.19"
+  }
+}

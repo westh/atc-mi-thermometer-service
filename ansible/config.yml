@@ -1,0 +1,10 @@
+---
+ansible_ssh_user: pi
+
+atc_service_repo: https://github.com/westh/atc-mi-thermometer-service.git
+atc_service_repo_installation_dir: /opt/atc-mi-thermometer-service
+atc_service_branch: master
+
+graphite_endpoint_url: "{{ lookup('env','GRAPHITE_ENDPOINT_URL') }}" # replace me or use the environment variable
+graphite_user: "{{ lookup('env','GRAPHITE_USER') }}" # replace me or use the environment variable
+graphite_password: "{{ lookup('env','GRAPHITE_PASSWORD') }}" # replace me or use the environment variable

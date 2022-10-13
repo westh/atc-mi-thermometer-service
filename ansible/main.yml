@@ -1,0 +1,58 @@
+---
+- hosts: all
+  become: true
+
+  vars_files:
+    - config.yml
+
+  pre_tasks:
+    - name: update and upgrade apt packages
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400
+
+    - name: make sure depenencies are installed
+      ansible.builtin.apt:
+        pkg:
+          - bluetooth
+          - bluez
+          - libbluetooth-dev
+          - libudev-dev
+
+  roles:
+    - role: geerlingguy.nodejs
+      nodejs_version: "16.x"
+
+  tasks:
+    - name: clone repo
+      ansible.builtin.git:
+        repo: "{{ atc_service_repo }}"
+        dest: "{{ atc_service_repo_installation_dir }}"
+        version: "{{ atc_service_branch }}"
+
+    - name: Set cap_net_raw on /usr/local/bin/node
+      community.general.capabilities:
+        path: /usr/local/bin/node
+        capability: cap_net_raw+eip
+        state: present
+
+    - name: install packages
+      community.general.npm:
+        path: "{{ atc_service_repo_installation_dir }}"
+  
+    - name: create service and get it going
+      ansible.builtin.import_role:
+        name:  tumf.systemd-service
+      vars:
+        systemd_service_name: atc-thermometer-service
+        systemd_service_Service_WorkingDirectory: "{{ atc_service_repo_installation_dir }}"
+        systemd_service_envs:
+          - "GRAPHITE_ENDPOINT_URL={{ graphite_endpoint_url }}"
+          - "GRAPHITE_USER={{ graphite_user }}"
+          - "GRAPHITE_PASSWORD={{ graphite_password }}"
+        systemd_service_Unit_Description: Picks up BLE messages from ATC Mi Thermometers and posts them to Grafana
+        systemd_service_Unit_After: network-online.target
+        systemd_service_Service_Restart: always
+        systemd_service_Service_RestartSec: 5
+        systemd_service_Service_ExecStart: /usr/bin/npm start
